@@ -15,7 +15,8 @@ SRCS_NAME = main.c \
 			vis_save_step.c \
 			vis_itoa_fd.c \
 			vis_utilities.c \
-			vis_float_itoa.c
+			vis_float_itoa.c \
+			acceleration.c
 
 SRCS = $(addprefix $(SRCS_PATH), $(SRCS_NAME))
 OBJ = $(addprefix $(OBJ_PATH), $(SRCS_NAME:.c=.o))
