@@ -12,11 +12,10 @@ SRCS_PATH = src/
 OBJ_PATH = obj/
 
 SRCS_NAME = main.c \
-			vis_save_step.c \
-			vis_itoa_fd.c \
-			vis_utilities.c \
-			vis_float_itoa.c \
-			acceleration.c
+			acceleration.c	\
+			malloc_tools.c \
+			free_tools.c	\
+			verlet.c
 
 SRCS = $(addprefix $(SRCS_PATH), $(SRCS_NAME))
 OBJ = $(addprefix $(OBJ_PATH), $(SRCS_NAME:.c=.o))
