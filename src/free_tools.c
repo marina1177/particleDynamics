@@ -22,6 +22,9 @@ void	ft_free2d(void **array, int len)
 	free(array);
 }
 
+void	free_particles(t_prtcl **prtcls){
+	
+}
 
 void	free_trap(t_trap **trap){
 

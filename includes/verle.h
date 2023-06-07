@@ -87,6 +87,8 @@ struct		s_particle
 };
 
 struct		s_forces
+
+
 {
 	double	F_tr[3];	// удерживающая сила ловушки
 	double	F_st[3];	// сила Стокса
@@ -146,7 +148,7 @@ char		*ft_strnew(size_t size);
 ** float_itoa_fd.c
 */
 int			float_itoa_fd(int fd, double d);
-
+	//t_frcs	forces;
 /*
 ** acceleration.c
 */
@@ -166,13 +168,13 @@ void		free_trap(t_trap **trap);
 /*
 ** verlet.c
 */
+void		calc_forces(t_trap	*trap, int p_indx, double t);
 int			verlet(t_trap **trap);
 
 /*
 ** main.c
 */
 int			handle_error(char *s);
-void		calc_forces(t_trap	*trap, int p_indx, double t);
 void		init_particle(t_prtcl	*particle);
 int			init_trap(t_trap	**trap, int	amount_of_particles);
 

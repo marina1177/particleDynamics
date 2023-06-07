@@ -1,5 +1,60 @@
 #include "../includes/verle.h"
 
+void	calc_forces(t_trap	*trap, int p_indx, double t){
+	// mg (horizontal trap)
+	trap->particles[p_indx].p_forces->F_mg[0] = 0;
+	trap->particles[p_indx].p_forces->F_mg[1] = -G_CONST * trap->particles[p_indx].m;
+	trap->particles[p_indx].p_forces->F_mg[2] = 0;
+	//printf("calc F_mg:	(%.3e, %.3e, %.2e)\n", trap->particles[p_indx].p_forces->F_mg[0], trap->particles[p_indx].p_forces->F_mg[1], trap->particles[p_indx].p_forces->F_mg[2]);
+
+	// Stokes
+	int i = 0;
+	while(i < 3){
+		trap->particles[p_indx].p_forces->F_st[i] = -6 * M_PI * trap->particles[p_indx].r[i] * trap->nu * trap->particles[p_indx].v[i];
+		i++;
+	}
+	//printf("calc F_St:	(%.3e, %.3e, %.3e)\n", trap->particles[p_indx].p_forces->F_st[0], trap->particles[p_indx].p_forces->F_st[1], trap->particles[p_indx].p_forces->F_st[2]);
+
+	// interparticle Columb interaction
+	double rdist[3];
+	i = 0;
+	while(i < trap->amount_of_particles){
+		if(i == p_indx){
+			i++;
+			continue;
+		}
+		rdist[0] = fabs(trap->particles[p_indx].r[0] - trap->particles[i].r[0]);
+		rdist[1] = fabs(trap->particles[p_indx].r[1] - trap->particles[i].r[1]);
+		rdist[2] = fabs(trap->particles[p_indx].r[2] - trap->particles[i].r[2]);
+		//printf("calc rdist:	(%.3e, %.3e, %.3e)\n", rdist[0], rdist[1], rdist[2]);
+
+		if(rdist[0] != 0){
+			trap->particles[p_indx].p_forces->F_q[0] += (K_CONST * trap->particles[p_indx].q * trap->particles[i].q) / pow(rdist[0],2);
+		}
+		if(rdist[1] != 0){
+			trap->particles[p_indx].p_forces->F_q[1] += (K_CONST * trap->particles[p_indx].q * trap->particles[i].q) / pow(rdist[1],2);
+		}
+		if(rdist[2] != 0){
+			trap->particles[p_indx].p_forces->F_q[2] += (K_CONST * trap->particles[p_indx].q * trap->particles[i].q) / pow(rdist[2],2);
+		}
+		i++;
+	}
+	//printf("calc F_q:	(%.3e, %.3e, %.3e)\n", trap->particles[p_indx].p_forces->F_q[0], trap->particles[p_indx].p_forces->F_q[1], trap->particles[p_indx].p_forces->F_q[2]);
+
+	// Trap force
+	double acc[3];
+	acc[0] = -(2 * trap->particles[p_indx].q / (trap->particles[p_indx].m * pow(trap->ra / 2,2))) * (trap->V + trap->Ua * cos(2 * M_PI * trap->freq * t)) * trap->particles[p_indx].r[0];;
+	acc[1] = (2 * trap->particles[p_indx].q / (trap->particles[p_indx].m * pow(trap->ra / 2,2))) * (trap->V + trap->Ua * cos(2 * M_PI * trap->freq * t)) * trap->particles[p_indx].r[1];
+	acc[2] = 0;
+
+	trap->particles[p_indx].p_forces->F_tr[0] = acc[0] * trap->particles[p_indx].m;
+	trap->particles[p_indx].p_forces->F_tr[1] = acc[1] * trap->particles[p_indx].m;
+	//printf("calc F_tr:	(%.3e, %.3e)\n", trap->particles[p_indx].p_forces->F_tr[0], trap->particles[p_indx].p_forces->F_tr[1]);
+
+}
+
+
+
 int verlet(t_trap **trap){
 
 	double dt= 1 / (*trap)->freq / 250;	// шаг времени
@@ -23,7 +78,7 @@ int verlet(t_trap **trap){
 	  || (*trap)->particles[i].r[1] < -0.02 || (*trap)->particles[i].r[1] > 0.02){
 
 		//запись завершается по вылету одной частицы из ловушки
-		//TODO надо прсто исключить ее из расчета
+		//!T ODO надо прсто исключить ее из расчета
 		//vis.end_game = 1;
 		printf("save last step #%d\n",t);
 		//save_step(t, &trap, &trap.particles[i], &vis);

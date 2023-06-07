@@ -32,7 +32,7 @@ $(OBJ_PATH)%.o: $(SRCS_PATH)%.c includes/verle.h
 		$(CC)  $(WFLAGS) $(INC) -c $< -o $@
 
 $(NAME): $(OBJ_PATH) $(OBJ)
-		@clang $(OBJ) $(INC) -lm  -o $(NAME)
+		$(CC) $(OBJ) $(INC) -lm  -o $(NAME)
 		@echo "\033[32mBinary \033[1;32m$(NAME)\033[1;0m\033[32m created.\033[0m"
 
 
