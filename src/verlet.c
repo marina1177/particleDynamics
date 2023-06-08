@@ -42,13 +42,13 @@ void	calc_forces(t_trap	*trap, int p_indx, double t){
 	//printf("calc F_q:	(%.3e, %.3e, %.3e)\n", trap->particles[p_indx].p_forces->F_q[0], trap->particles[p_indx].p_forces->F_q[1], trap->particles[p_indx].p_forces->F_q[2]);
 
 	// Trap force
-	double acc[3];
-	acc[0] = -(2 * trap->particles[p_indx].q / (trap->particles[p_indx].m * pow(trap->ra / 2,2))) * (trap->V + trap->Ua * cos(2 * M_PI * trap->freq * t)) * trap->particles[p_indx].r[0];;
-	acc[1] = (2 * trap->particles[p_indx].q / (trap->particles[p_indx].m * pow(trap->ra / 2,2))) * (trap->V + trap->Ua * cos(2 * M_PI * trap->freq * t)) * trap->particles[p_indx].r[1];
-	acc[2] = 0;
+//	double acc[3];
+	trap->particles[p_indx].a[0] = -(2 * trap->particles[p_indx].q / (trap->particles[p_indx].m * pow(trap->ra / 2,2))) * (trap->V + trap->Ua * cos(2 * M_PI * trap->freq * t)) * trap->particles[p_indx].r[0];;
+	trap->particles[p_indx].a[1]= (2 * trap->particles[p_indx].q / (trap->particles[p_indx].m * pow(trap->ra / 2,2))) * (trap->V + trap->Ua * cos(2 * M_PI * trap->freq * t)) * trap->particles[p_indx].r[1];
+	trap->particles[p_indx].a[2]= 0;
 
-	trap->particles[p_indx].p_forces->F_tr[0] = acc[0] * trap->particles[p_indx].m;
-	trap->particles[p_indx].p_forces->F_tr[1] = acc[1] * trap->particles[p_indx].m;
+	trap->particles[p_indx].p_forces->F_tr[0] = trap->particles[p_indx].a[0] * trap->particles[p_indx].m;
+	trap->particles[p_indx].p_forces->F_tr[1] = trap->particles[p_indx].a[1] * trap->particles[p_indx].m;
 	//printf("calc F_tr:	(%.3e, %.3e)\n", trap->particles[p_indx].p_forces->F_tr[0], trap->particles[p_indx].p_forces->F_tr[1]);
 
 }
@@ -62,7 +62,7 @@ int verlet(t_trap **trap){
 
 	int nh = t_fin / dt; //количество шагов
 	printf("calculation time[s]:	%f, amount of steps:	%d\n", t_fin, nh);
-	printf("#############################\n\n");
+	//printf("#############################\n\n");
 
 	int t = 0;
 	while( t <= nh){
@@ -78,7 +78,7 @@ int verlet(t_trap **trap){
 	  || (*trap)->particles[i].r[1] < -0.02 || (*trap)->particles[i].r[1] > 0.02){
 
 		//запись завершается по вылету одной частицы из ловушки
-		//!T ODO надо прсто исключить ее из расчета
+		//!TODO надо прсто исключить ее из расчета
 		//vis.end_game = 1;
 		printf("save last step #%d\n",t);
 		//save_step(t, &trap, &trap.particles[i], &vis);
@@ -89,11 +89,8 @@ int verlet(t_trap **trap){
 		(*trap)->particles[i].v[0] += 0.5*(*trap)->particles[i].a[0]*dt;
 		(*trap)->particles[i].v[1] += 0.5*(*trap)->particles[i].a[1]*dt;
 
-	// вычисление нового ускорения
-		// a = F(r)/m
-		//particle.a = calc_acceleration(&forces);
-		(*trap)->particles[i].a[0] += 0.01;
-		(*trap)->particles[i].a[1] += 0.02;
+	// вычисление сил & нового ускорения
+		calc_forces(*trap, i, t*dt);
 
 	// вычисление скорости с новым ускорением
 		(*trap)->particles[i].v[0] += 0.5*(*trap)->particles[i].a[0]*dt;
@@ -105,6 +102,7 @@ int verlet(t_trap **trap){
 	// сохранение шага
 		if(t == nh){
 			printf("save last step #%d\n",t);
+			
 			//vis.end_game = 1;
 		}
 		//save_step(t, &trap, &vis);

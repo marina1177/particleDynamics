@@ -60,7 +60,7 @@ int	init_trap(t_trap	**trap, int	amount_of_particles){
 		while(i < amount_of_particles){
 			(*trap)->particles[i].p_indx =i;
 			init_particle(&(*trap)->particles[i]);
-			printf("\nPARTICLE NUMBER	#%d\n", (*trap)->particles[i].p_indx);
+			printf("PARTICLE NUMBER	#%d is initiated !\n", (*trap)->particles[i].p_indx);
 			if ((*trap)->particles[i].p_forces = (t_frcs*)malloc(sizeof(t_frcs))){
 				calc_forces((*trap), i, 0);
 			}
@@ -87,16 +87,9 @@ int		main(int ac, char **av)
 
 	printf("#####	PRECONDITIONS	#####\n\n");
 	!(trap = (t_trap *)malloc(sizeof(t_trap))) ? handle_error(ERR_ALLOC) : 0;
-	//!(particles = (t_prtcl *)malloc(amount_of_particle*sizeof(t_prtcl))) ? handle_error(ERR_ALLOC) : 0;
-
 	init_trap(&trap, amount_of_particles);
 
-	int i = 0;
-	while(i < trap->amount_of_particles){
-		printf("FROM MAin(%d): particle index = %d\n",i,trap->particles[i].p_indx);
-		i++;
-	}
-		
+	printf("#####	VERLET	#####\n\n");
 	verlet(&trap);
 
 	return 0;
