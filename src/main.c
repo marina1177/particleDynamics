@@ -80,16 +80,40 @@ int	init_trap(t_trap	**trap, int	amount_of_particles){
 
 int		main(int ac, char **av)
 {
+	FILE *fp;
+
 	t_prtcl	*particles;
 	t_trap	*trap;
 	t_vis	vis;
 	int		amount_of_particles = 3;
 
+//read start parameters fulltime, timestep, amount of particles
+	for(int i =0; i<ac; i++){
+
+		puts(*av++);
+
+	}
+
+	if((fp=fopen("calc", "wb+"))==NULL) {
+    	printf("Ошибка при открытии файла.\n");
+    	exit(1);
+  	}
+
 	printf("#####	PRECONDITIONS	#####\n\n");
 	!(trap = (t_trap *)malloc(sizeof(t_trap))) ? handle_error(ERR_ALLOC) : 0;
 	init_trap(&trap, amount_of_particles);
+	
+	printf("double sizeof: %ld\n",sizeof(double));
+	printf("int sizeof: %ld\n",sizeof(int));
+	printf("char sizeof: %ld\n",sizeof(char));
+	
+	double sizeof_parameters =  sizeof(double)*7;
+	fwrite(&sizeof_parameters, sizeof(double), 1, fp);
+  	// fwrite(&i, sizeof(int), 1, fp);
+  	// fwrite(&l, sizeof(long), 1, fp);
 
 	printf("#####	VERLET	#####\n\n");
+
 	verlet(&trap);
 
 	return 0;
