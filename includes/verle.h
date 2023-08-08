@@ -18,7 +18,11 @@
 # define G_CONST 			9.8
 # define EPS_CONST			8.854e-12 //электрическая постоянная
 # define K_CONST			1/(4*3.14*EPS_CONST)
+
+# define AMOUNT_OF_PARAMS  10
+
 # define ERR_ALLOC "Can\'t allocate memory"
+
 
 typedef struct s_params			t_params;
 typedef struct s_array_of_v4	t_arrv4;
@@ -105,7 +109,10 @@ struct		s_trap
 	double		freq;	// [Hz] частота переменного напряжения на электродах
 	double		nu;		// вязкость среды (воздуха)
 
-	int			amount_of_particles;
+	double		amount_of_particles;
+	double		tfull;
+	double		tstep;
+	double		tcurr;
 	//t_params	params;
 	t_prtcl		*particles;
 
@@ -145,6 +152,11 @@ int			vs_itoa_fd(int fd, int n);
 char		*ft_strnew(size_t size);
 
 /*
+** ft_strsplit.c
+*/
+char		**ft_strsplit(char const *s, char c);
+
+/*
 ** float_itoa_fd.c
 */
 int			float_itoa_fd(int fd, double d);
@@ -156,7 +168,7 @@ int			float_itoa_fd(int fd, double d);
 /*
 ** malloc_tools.c
 */
-int malloc_2d_double_array(double **arr, int x, int y);
+int			malloc_2d_double_array(double **arr, int x, int y);
 
 /*
 ** free_tools.c
@@ -166,16 +178,40 @@ void		ft_free2d(void **array, int len);
 void		free_trap(t_trap **trap);
 
 /*
+** fp_save_step.c
+*/
+void		write_particle_state(FILE *fp, int i, t_prtcl	*particle);
+void		write_particle_parameters(FILE *fp, int i, t_prtcl	*particle);
+int			fp_save_step(t_trap **trap, FILE *fp);
+
+/*
 ** verlet.c
 */
+void		mg_calc(t_trap	*trap,  int p_indx);
+void		f_Stokes_calc(t_trap	*trap,  int p_indx);
+void		interparticle_Columb_calc(t_trap	*trap,  int p_indx, double t);
+void		particle_acceleration_calc(t_trap	*trap,  int p_indx, double t);
+void		f_trap_calc(t_trap	*trap,  int p_indx);
 void		calc_forces(t_trap	*trap, int p_indx, double t);
-int			verlet(t_trap **trap);
+int			verlet(t_trap **trap, FILE *fp);
+
+/*
+** init.c
+*/
+double 		randfrom(double min, double max);
+void		init_particle_velocity(FILE *fp, t_prtcl	*particle);
+void		init_particle_position(FILE *fp, t_prtcl	*particle);
+
+void		init_particle(FILE *fp, t_prtcl	*particle);
+int			init_trap(FILE *fp, t_trap	**trap);
+int			check_flags(FILE *fp, int ac, char **av, t_trap	**trap);
+int			start_parameters_generator(FILE *fp, int ac, char **av, t_trap **trap);
+
 
 /*
 ** main.c
 */
 int			handle_error(char *s);
-void		init_particle(t_prtcl	*particle);
-int			init_trap(t_trap	**trap, int	amount_of_particles);
+
 
 #endif

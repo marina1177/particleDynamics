@@ -1,0 +1,50 @@
+
+1. сколько байт на параметры 58(double sizeof = 8)
+2. amount of particles
+3. все время расчета (*trap)->tfull
+4. timestep (*trap)->tstep
+5. диаметр электрода
+6. расстояние между центрами
+7. Амплитуда переменного напряжения
+8. freq
+9. амплитуда постянного напряжения
+10. вязкость среды
+
+
+>> запись параметров(startbit, rho, d, q, r[3], v[3], a[3]) частиц на каждом шаге
+     (если startbit==1 -> начало шага)
+
+class Parameters(Structure):
+   _fields_ = [
+        ('amount_of_particle', c_double),
+        ('t_full', c_double),
+        ('t_step', c_double),
+        ('a', c_double),
+        ('ra', c_double),
+        ('Uac', c_double),
+        ('freq', c_double),
+        ('Udc', c_double),
+        ('nu', c_double)]
+
+Евгений Вихров, [01.08.2023 16:44]
+from ctypes import *
+
+Евгений Вихров, [01.08.2023 16:44]
+class Particle(Structure):
+    _fields_ = [
+        ('x', c_double),
+        ('y', c_double),
+        ('z', c_double),
+        ('w', c_double),
+        ('vx', c_double),
+        ('vy', c_double),
+        ('vz', c_double),
+        ('vw', c_double)]
+
+Евгений Вихров, [01.08.2023 16:44]
+ну потом что то такое типа описываешь свою
+
+Евгений Вихров, [01.08.2023 16:45]
+file = open(args.file, 'rb')
+        file.readinto(Parameters) == sizeof(Parameters)
+        file.close()
