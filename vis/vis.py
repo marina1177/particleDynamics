@@ -10,6 +10,8 @@ import awkward as ak
 #from struct import *
 import binascii
 import struct
+import matplotlib.pyplot as plt
+from matplotlib import animation
 
 PARAMETERS_SIZE = 10
 STEP_SIZE = 4 + 3 * 3
@@ -57,18 +59,9 @@ def calc_amount_of_steps(data_len):
 
     return data_len // STEP_SIZE
 
-def main():
-    data = array.array('d')
-    with open('../calc', 'rb') as f:
-        n = os.fstat(f.fileno()).st_size // 8
-        data.fromfile(f, n)
-    f.close()
+def load_data(data, parameters):
+    amount_of_steps = calc_amount_of_steps(len(data) - PARAMETERS_SIZE)
 
-    parameter_len = int(data[0] // 8)
-    parameters = Parameters(data[1:parameter_len])
-    print_class(parameters)
-
-    amount_of_steps = calc_amount_of_steps(len(data)-PARAMETERS_SIZE)
     steps = []
 
     start = int(PARAMETERS_SIZE)
@@ -79,18 +72,72 @@ def main():
             particle_indx = 1
             time = time + parameters.t_step
 
-        steps.append(ParticleState(particle_indx, time, data[start+1:start+STEP_SIZE]))
+        steps.append(ParticleState(particle_indx, time, data[start + 1:start + STEP_SIZE]))
 
         start = start + STEP_SIZE
         particle_indx = particle_indx + 1
+    return steps
 
 
-    for j in range(1*int(parameters.amount_of_particle)):
-        print_class(steps[j])
+def main():
+    data = array.array('d')
+    with open('../calc', 'rb') as f:
+        n = os.fstat(f.fileno()).st_size // 8
+        data.fromfile(f, n)
+    f.close()
 
-        # !TODO draw!
+    parameter_len = int(data[0] // 8)
+    parameters = Parameters(data[1:parameter_len])
+    steps = load_data(data, parameters)
+
+    # for j in range(2*int(parameters.amount_of_particle)):
+    #     print_class(steps[j])
+
+    # !TODO draw!
+
+    N = int(parameters.t_full / parameters.t_step)
+
+    # Setup the figure and axes...
+    fig, ax = plt.subplots(figsize=(6, 6))
+    trap_size = parameters.ra
+    ax.set(xlim=(-trap_size/2, trap_size/2), ylim=(-trap_size/2, trap_size/2), ylabel='meters', xlabel='meters', title='2D Particle dynamics')
+
+    r = np.zeros((N + 1, int(parameters.amount_of_particle), 3))
+
+    for k in range(N*int(parameters.amount_of_particle)):
+        dt = int(k//int(parameters.amount_of_particle))
+        #print("t = ", dt, "indx = ", steps[k].indx)
+        r[dt, steps[k].indx-1, 0] = steps[k].rx
+        r[dt, steps[k].indx-1, 1] = steps[k].ry
+        r[dt, steps[k].indx-1, 2] = steps[k].rz
+
+
+    # for n in range(2*int(parameters.amount_of_particle)):
+    #     dt = int(n // int(parameters.amount_of_particle))
+    #     print("t = ",dt, "indx = ",steps[n].indx)
+    #     print("rx=",r[dt, steps[n].indx-1, 0],
+    #           " ry=",r[dt, steps[n].indx-1, 1],
+    #            " rz=",r[dt, steps[n].indx-1, 2])
+
+
+
+    ## drawing and animating
+    scat = ax.scatter(r[0, :, 0], r[0, :, 1], marker='o', c=['b'], s=100)
+
+    def animate(i):
+        scat.set_offsets(r[i])
+
+    ani = animation.FuncAnimation(fig, animate, frames=N)
+    plt.close()
+    ## this function will create a lot of *.png files in a folder '3Body_frames'
+    ani.save('particle_dynamics.html', writer=animation.HTMLWriter(fps=(1//parameters.t_step)))
+
+    from IPython.display import HTML
+    HTML('CNtower.html')
+
 
 if __name__ == "__main__":
     main()
-#           5
-# | | | > | | | > | | |
+#   0 1 2   3 4 5
+# # | | | > | | | > | | |
+#целая часть от деления на 3 - номер интервала

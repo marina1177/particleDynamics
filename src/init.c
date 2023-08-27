@@ -49,21 +49,27 @@ static void write_trap_parameters_to_file(FILE *fp, t_trap	**trap){
 	//TODO считывать начальные параметры из файла
 	(*trap)->a = 0.004;	// [m] диаметр электрода
 	fwrite(&((*trap)->a), sizeof(double), 1, fp);
+	printf("5. diameter of electrode, a[m]: %f\n", (*trap)->a);
 
 	(*trap)->ra = 0.019;	// [m] расстояние между центрами электродов
 	fwrite(&((*trap)->ra), sizeof(double), 1, fp);
+	printf("6. distance between centers of electrodes, ra[m]: %f\n", (*trap)->ra);
 
 	(*trap)->Ua = 5000;	// [V] амплитуда переменного напряжения на электродах
 	fwrite(&((*trap)->Ua), sizeof(double), 1, fp);
+	printf("7. AC amplitude, Ua[V]: %f\n", (*trap)->Ua);
 
 	(*trap)->V = 0;		// [V] амплитуда постянного напряжения на электродах
 	fwrite(&((*trap)->V), sizeof(double), 1, fp);
+	printf("8. DC amplitude, V[V]: %f\n", (*trap)->V);
 
 	(*trap)->freq = 50;
 	fwrite(&((*trap)->freq), sizeof(double), 1, fp);
+	printf("9. frequency, freq[Hz]: %f\n", (*trap)->freq);
 
 	(*trap)->nu = 18.27*pow(10,-6);	// вязкость среды (воздуха)
 	fwrite(&((*trap)->nu), sizeof(double), 1, fp);
+	printf("10. Air viscosity, nu[Pa*s]: %f\n", (*trap)->freq);
 }
 
 
@@ -99,7 +105,7 @@ int	init_trap(FILE *fp, t_trap	**trap){
 			write_particle_state(fp, i, &(*trap)->particles[i]);
 			write_particle_parameters(fp, i, &(*trap)->particles[i]);
 
-			printf("PARTICLE NUMBER	#%d is initiated !\n", (*trap)->particles[i].p_indx);
+			//printf("PARTICLE NUMBER	#%d is initiated !\n", (*trap)->particles[i].p_indx);
 			if ((*trap)->particles[i].p_forces = (t_frcs*)malloc(sizeof(t_frcs))){
 				calc_forces((*trap), i, 0);
 			}
@@ -110,7 +116,7 @@ int	init_trap(FILE *fp, t_trap	**trap){
 
 			i++;
 		}
-		printf("finish trap\n");
+		//printf("finish trap\n");
 		return(0);
 }
 
@@ -129,12 +135,12 @@ int check_flags(FILE *fp, int ac, char **av, t_trap	**trap){
 	argc = 1;
 
 	while (argv[argc] != NULL && argv[argc][0] == '-'){
-		printf("argv[%d] = %s\n", argc, argv[argc]);
+		//printf("argv[%d] = %s\n", argc, argv[argc]);
 
 		if (argv[argc][1] == 'a'){
 			argc++;
 			(*trap)->amount_of_particles = atoi(argv[argc]);
-			printf("fwrite amount_of_particles: %f\n", (*trap)->amount_of_particles);
+			printf("2. amount of particles: %f\n", (*trap)->amount_of_particles);
 			fwrite(&((*trap)->amount_of_particles), sizeof(double), 1, fp);
 		}
 		else if(strcmp(argv[argc],"-t") == 0){
@@ -144,12 +150,6 @@ int check_flags(FILE *fp, int ac, char **av, t_trap	**trap){
 			char *istr;
 
 			char **split = ft_strsplit(argv[argc], ':');
-
-			// int i =0;
-			// while(split[i]!=NULL){
-			// 	printf("split[%d] = %s\n", i, split[i]);
-			// 	i++;
-			// }
 
 			if(sizeof(split)<3){
 				printf("usage -t: start:step:end time\n");
@@ -165,8 +165,8 @@ int check_flags(FILE *fp, int ac, char **av, t_trap	**trap){
 			fwrite(&((*trap)->tfull), sizeof(double), 1, fp);
 			fwrite(&((*trap)->tstep), sizeof(double), 1, fp);
 
-			printf("fwrite tfull, tstep is completed! \n");
-
+			printf("3. full time of calc: %f\n",(*trap)->tfull);
+			printf("4. timestep: %f\n",(*trap)->tstep);
 
 		}
 		else{
@@ -189,6 +189,7 @@ int	start_parameters_generator(FILE *fp, int ac, char **av, t_trap	**trap){
 
 		double sizeof_parameters =  sizeof(double)*AMOUNT_OF_PARAMS;
 	//сколько байт на параметры (double sizeof = 8)
+		printf("1.bytes of parameters: %lf\n", sizeof_parameters);
 		fwrite(&sizeof_parameters, sizeof(double), 1, fp);
 
 	// check flags and set parameters

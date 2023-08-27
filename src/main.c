@@ -59,6 +59,6 @@ int		main(int ac, char **av)
 	verlet(&trap,fp);
 
 	fclose(fp);
-	read_and_print();
+	//read_and_print();
 	return 0;
 }

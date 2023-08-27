@@ -83,6 +83,7 @@ void	calc_forces(t_trap	*trap, int p_indx, double t){
 
 int verlet(t_trap **trap, FILE *fp){
 
+
 	double dt= 1 / (*trap)->freq / 250;	// шаг времени
 	double t_fin = 20 / (*trap)->freq;	//[s] время окончания расчетов
 

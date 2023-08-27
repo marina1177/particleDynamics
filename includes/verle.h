@@ -26,7 +26,7 @@
 
 typedef struct s_params			t_params;
 typedef struct s_array_of_v4	t_arrv4;
-typedef struct s_vector4		t_v4;
+typedef struct s_vector		t_v3;
 
 typedef struct s_particle	t_prtcl;
 typedef struct s_trap		t_trap;
@@ -63,11 +63,19 @@ t_v4	*p_arr;
 };
 
 
-struct		s_vector4{
+struct		s_vector3{
 
 double	x;
 double	y;
 double	z;
+double	vx;
+double	vy;
+double	vz;
+
+double	r0;		// [m] диаметр, размер частицы
+double	mg;		// [kg] масса частицы
+double	q;		// [e] заряд в единицах элементарного заряда e
+
 double	w;
 };
 
