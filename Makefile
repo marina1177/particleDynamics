@@ -12,6 +12,9 @@ SRCS_PATH = src/
 OBJ_PATH = obj/
 
 SRCS_NAME = main.c \
+			mem_manage.c \
+			print_output.c \
+			
 			init.c \
 			acceleration.c	\
 			malloc_tools.c \

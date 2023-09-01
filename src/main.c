@@ -35,30 +35,11 @@ void read_and_print(){
 
 int		main(int ac, char **av)
 {
-	FILE *fp;
-	t_trap	*trap;
-	t_vis	vis;
-	int		amount_of_particles = 3;
+	t_arrv3 crds;
+	t_arrv3 vlcts;
+	t_arrv3 props;
 
-	if((fp=fopen("calc", "wb+"))==NULL) {
-    	printf("Ошибка при открытии файла.\n");
-    	exit(1);
-  	}
 
-	printf("#####	PRECONDITIONS	#####\n\n");
-	!(trap = (t_trap *)malloc(sizeof(t_trap))) ? handle_error(ERR_ALLOC) : 0;
-	if(start_parameters_generator(fp, ac, av, &trap) <0){
-		printf("start parameter error!\n");
-		exit(0);
-	}
 
-// !TODO запись начальных параметрв и положений частиц в файл
-	init_trap(fp, &trap);
-
-	printf("#####	VERLET	#####\n\n");
-	verlet(&trap,fp);
-
-	fclose(fp);
-	//read_and_print();
 	return 0;
 }
