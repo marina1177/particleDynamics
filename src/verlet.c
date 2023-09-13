@@ -3,6 +3,7 @@
 void mg_calc(t_trap	*trap,  int p_indx){
 
 	trap->particles[p_indx].p_forces->F_mg[0] = 0;
+
 	trap->particles[p_indx].p_forces->F_mg[1] = -G_CONST * trap->particles[p_indx].m;
 	trap->particles[p_indx].p_forces->F_mg[2] = 0;
 	//printf("calc F_mg:	(%.3e, %.3e, %.2e)\n", trap->particles[p_indx].p_forces->F_mg[0], trap->particles[p_indx].p_forces->F_mg[1], trap->particles[p_indx].p_forces->F_mg[2]);
@@ -32,12 +33,15 @@ void interparticle_Columb_calc(t_trap	*trap,  int p_indx, double t){
 
 		if(rdist[0] != 0){
 			trap->particles[p_indx].p_forces->F_q[0] += (K_CONST * trap->particles[p_indx].q * trap->particles[i].q) / pow(rdist[0],2);
+			trap->particles[p_indx].a[0] += trap->particles[p_indx].p_forces->F_q[0] / trap->particles[p_indx].m;
 		}
 		if(rdist[1] != 0){
 			trap->particles[p_indx].p_forces->F_q[1] += (K_CONST * trap->particles[p_indx].q * trap->particles[i].q) / pow(rdist[1],2);
+			trap->particles[p_indx].a[1] += trap->particles[p_indx].p_forces->F_q[1] / trap->particles[p_indx].m;
 		}
 		if(rdist[2] != 0){
 			trap->particles[p_indx].p_forces->F_q[2] += (K_CONST * trap->particles[p_indx].q * trap->particles[i].q) / pow(rdist[2],2);
+			trap->particles[p_indx].a[2] += trap->particles[p_indx].p_forces->F_q[2] / trap->particles[p_indx].m;
 		}
 		i++;
 	}
@@ -47,8 +51,8 @@ void interparticle_Columb_calc(t_trap	*trap,  int p_indx, double t){
 void particle_acceleration_calc(t_trap	*trap,  int p_indx, double t){
 
 //	double acc[3];
-	trap->particles[p_indx].a[0] = -(2 * trap->particles[p_indx].q / (trap->particles[p_indx].m * pow(trap->ra / 2,2))) * (trap->V + trap->Ua * cos(2 * M_PI * trap->freq * t)) * trap->particles[p_indx].r[0];;
-	trap->particles[p_indx].a[1]= (2 * trap->particles[p_indx].q / (trap->particles[p_indx].m * pow(trap->ra / 2,2))) * (trap->V + trap->Ua * cos(2 * M_PI * trap->freq * t)) * trap->particles[p_indx].r[1];
+	trap->particles[p_indx].a[0] = -(2 * trap->particles[p_indx].q / (trap->particles[p_indx].m * pow(trap->ra / 2, 2))) * (trap->V + trap->Ua * cos(2 * M_PI * trap->freq * t)) * trap->particles[p_indx].r[0];
+	trap->particles[p_indx].a[1]= (2 * trap->particles[p_indx].q / (trap->particles[p_indx].m * pow(trap->ra / 2, 2))) * (trap->V + trap->Ua * cos(2 * M_PI * trap->freq * t)) * trap->particles[p_indx].r[1];
 	trap->particles[p_indx].a[2]= 0;
 }
 
@@ -63,7 +67,7 @@ void f_trap_calc(t_trap	*trap,  int p_indx){
 
 void	calc_forces(t_trap	*trap, int p_indx, double t){
 
-	// mg (horizontal trap)
+	//! Сделать константой mg (horizontal trap)
 	mg_calc(trap,p_indx);
 
 	// Stokes
@@ -79,7 +83,41 @@ void	calc_forces(t_trap	*trap, int p_indx, double t){
 
 }
 
+int check_boarder_conditions(t_trap	**trap, int p_indx){
 
+	if ((*trap)->particles[p_indx].out == 0 &&
+			((*trap)->particles[p_indx].r[0] < -0.02 || (*trap)->particles[p_indx].r[0] > 0.02
+	  			|| (*trap)->particles[p_indx].r[1] < -0.02 || (*trap)->particles[p_indx].r[1] > 0.02)){
+
+				//!TODO надо прсто исключить ее из расчета
+				printf("particle #%d is out!\n",(*trap)->particles[p_indx].p_indx);
+				(*trap)->particles[p_indx].out = 1;
+				return 1;
+			}
+	return 0;
+}
+
+void clean_acc(t_trap	*trap, int p_indx){
+
+	trap->particles[p_indx].a[0] = 0;
+	trap->particles[p_indx].a[1] = 0;
+	trap->particles[p_indx].a[2] = 0; 
+
+}
+
+void	calc_crdnts(t_trap	**trap, int partcl_num, double dt){
+
+	(*trap)->particles[partcl_num].r[0] += (*trap)->particles[partcl_num].v[0]*dt + 0.5*(*trap)->particles[partcl_num].a[0]*pow(dt,2);
+	(*trap)->particles[partcl_num].r[1] += (*trap)->particles[partcl_num].v[1]*dt + 0.5*(*trap)->particles[partcl_num].a[1]*pow(dt,2);
+
+}
+
+void	calc_half_vlcts(t_trap	**trap, int partcl_num, double dt){
+
+	(*trap)->particles[partcl_num].v[0] += 0.5*(*trap)->particles[partcl_num].a[0]*dt;
+	(*trap)->particles[partcl_num].v[1] += 0.5*(*trap)->particles[partcl_num].a[1]*dt;
+
+}
 
 int verlet(t_trap **trap, FILE *fp){
 
@@ -96,36 +134,29 @@ int verlet(t_trap **trap, FILE *fp){
 	int t = 0;
 	while( t <= nh){
 		(*trap)->tcurr = t*dt;
-		int i=0;
-		while(i <(*trap)->amount_of_particles){
-
-			(*trap)->particles[i].r[0] += (*trap)->particles[i].v[0]*dt + 0.5*(*trap)->particles[i].a[0]*pow(dt,2);
-			(*trap)->particles[i].r[1] += (*trap)->particles[i].v[1]*dt + 0.5*(*trap)->particles[i].a[1]*pow(dt,2);
+		int partcl_num=0;
+		while(partcl_num <(*trap)->amount_of_particles){
+			// r_i+1
+			calc_crdnts(trap, partcl_num, dt);
 
 			// %проверка граничных условий
-      		if ((*trap)->particles[i].r[0] < -0.02 || (*trap)->particles[i].r[0] > 0.02
-	  			|| (*trap)->particles[i].r[1] < -0.02 || (*trap)->particles[i].r[1] > 0.02){
-
-		//запись завершается по вылету одной частицы из ловушки
-		//!TODO надо прсто исключить ее из расчета
-		//vis.end_game = 1;
-				printf("save last step #%d\n",t);
-		//save_step(t, &trap, &trap.particles[i], &vis);
-				return 0;
+			if( check_boarder_conditions(trap, partcl_num)){
+				//save_step(t, &trap, &trap.particles[i], &vis);
+				continue;
 		}
 
+			//V_i+1 = V_i + 0.5(a_i + a_i+1)*dt = V_i + 0.5*a_i*dt + 0.5*a_i+1*dt
 			// вычисление скорости со старым ускорением
-			(*trap)->particles[i].v[0] += 0.5*(*trap)->particles[i].a[0]*dt;
-			(*trap)->particles[i].v[1] += 0.5*(*trap)->particles[i].a[1]*dt;
+			calc_half_vlcts(trap, partcl_num, dt);
 
+			clean_acc(trap, partcl_num);
 			// вычисление сил & нового ускорения
-			calc_forces(*trap, i, t*dt);
+			calc_forces(*trap, partcl_num, t*dt);
 
 			// вычисление скорости с новым ускорением
-			(*trap)->particles[i].v[0] += 0.5*(*trap)->particles[i].a[0]*dt;
-			(*trap)->particles[i].v[1] += 0.5*(*trap)->particles[i].a[1]*dt;
+			calc_half_vlcts(trap, partcl_num, dt);
 
-			i++;
+			partcl_num++;
 	}
 
 		// сохранение шага

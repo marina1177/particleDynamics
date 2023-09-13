@@ -37,8 +37,8 @@ int		main(int ac, char **av)
 {
 	FILE *fp;
 	t_trap	*trap;
-	t_vis	vis;
-	int		amount_of_particles = 3;
+	//t_vis	vis;
+	//int		amount_of_particles = 3;
 
 	if((fp=fopen("calc", "wb+"))==NULL) {
     	printf("Ошибка при открытии файла.\n");

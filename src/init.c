@@ -147,8 +147,6 @@ int check_flags(FILE *fp, int ac, char **av, t_trap	**trap){
 			argc++;
 
 			char sep [10]=":";
-			char *istr;
-
 			char **split = ft_strsplit(argv[argc], ':');
 
 			if(sizeof(split)<3){

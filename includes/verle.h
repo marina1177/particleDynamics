@@ -59,7 +59,7 @@ struct		s_array_of_v4{
 int		max;
 int		len;
 
-t_v4	*p_arr;
+//t_v4	*p_arr;
 };
 
 
@@ -84,6 +84,7 @@ double	w;
 struct		s_particle
 {
 	int		p_indx;
+	int		out;
 	double	r[3];	// [m] координаты
 
 // TODO v & a сразу записывать и не хранить
