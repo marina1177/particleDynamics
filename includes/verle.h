@@ -21,6 +21,9 @@
 
 # define AMOUNT_OF_PARAMS  10
 
+# define T_STEP  10
+# define T_FULL  20
+
 # define ERR_ALLOC "Can\'t allocate memory"
 
 
@@ -88,8 +91,8 @@ struct		s_particle
 	double	r[3];	// [m] координаты
 
 // TODO v & a сразу записывать и не хранить
-	 double	v[3];	// [m/s]скорость
-	 double	a[3];	// [m/s^2] ускорение
+	 long double	v[3];	// [m/s]скорость
+	 long double	a[3];	// [m/s^2] ускорение
 
 	double	rho;	// [kg/m^3] плотность
 	double	d;		// [m] диаметр, размер частицы
@@ -100,13 +103,11 @@ struct		s_particle
 };
 
 struct		s_forces
-
-
 {
-	double	F_tr[3];	// удерживающая сила ловушки
-	double	F_st[3];	// сила Стокса
+	long double	F_tr[3];	// удерживающая сила ловушки
+	long double	F_st[3];	// сила Стокса
 	double	F_mg[3];	// сила гравитации
-	double	F_q[3];		// сила Кулона
+	long double	F_q[3];		// сила Кулона
 };
 
 struct		s_trap
@@ -197,10 +198,9 @@ int			fp_save_step(t_trap **trap, FILE *fp);
 ** verlet.c
 */
 void		mg_calc(t_trap	*trap,  int p_indx);
-void		f_Stokes_calc(t_trap	*trap,  int p_indx);
+void		Stokes_calc(t_trap	*trap,  int p_indx);
 void		interparticle_Columb_calc(t_trap	*trap,  int p_indx, double t);
-void		particle_acceleration_calc(t_trap	*trap,  int p_indx, double t);
-void		f_trap_calc(t_trap	*trap,  int p_indx);
+void		acc_trap_calc(t_trap	*trap,  int p_indx, double t);
 void		calc_forces(t_trap	*trap, int p_indx, double t);
 int			verlet(t_trap **trap, FILE *fp);
 

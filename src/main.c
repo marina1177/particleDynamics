@@ -33,6 +33,30 @@ void read_and_print(){
 	fclose(fp2);
 }
 
+int static print_parameters(t_trap **trap){
+
+	printf("trap_a: %f\n",(*trap)->a);
+	printf("trap_ra: %f\n",(*trap)->ra);
+	printf("trap_Ua: %f\n",(*trap)->Ua);
+	printf("trap_V: %f\n",(*trap)->V);
+	printf("trap_freq: %f\n",(*trap)->freq);
+	printf("trap_nu: %f\n",(*trap)->nu);
+	printf("trap_amount_of_particles: %f\n",(*trap)->amount_of_particles);
+	printf("trap_tfull: %f\n",(*trap)->tfull);
+	printf("trap_tstep: %f\n",(*trap)->tstep);
+	printf("trap_tcurr: %f\n",(*trap)->tcurr);
+
+	int ap = (*trap)->amount_of_particles;
+
+	for(int i =0; i< ap; i++){
+		printf("\nPARTICLE #%d\n", i);
+		printf("p_r[0]: %f\n",(*trap)->particles[i].r[0]);
+		printf("p_r[1]: %f\n",(*trap)->particles[i].r[1]);
+		printf("p_r[2]: %f\n",(*trap)->particles[i].r[2]);
+	}
+
+}
+
 int		main(int ac, char **av)
 {
 	FILE *fp;
@@ -47,7 +71,7 @@ int		main(int ac, char **av)
 
 	printf("#####	PRECONDITIONS	#####\n\n");
 	!(trap = (t_trap *)malloc(sizeof(t_trap))) ? handle_error(ERR_ALLOC) : 0;
-	if(start_parameters_generator(fp, ac, av, &trap) <0){
+	if(start_parameters_generator(fp, ac, av, &trap) < 0){
 		printf("start parameter error!\n");
 		exit(0);
 	}
@@ -55,6 +79,7 @@ int		main(int ac, char **av)
 // !TODO запись начальных параметрв и положений частиц в файл
 	init_trap(fp, &trap);
 
+	//print_parameters(&trap);
 	printf("#####	VERLET	#####\n\n");
 	verlet(&trap,fp);
 

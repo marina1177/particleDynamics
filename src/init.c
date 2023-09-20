@@ -126,10 +126,10 @@ int check_flags(FILE *fp, int ac, char **av, t_trap	**trap){
 	int		argc;
 	int		fcnt;
 
-	if (ac < 5){
-		printf("\n args format usage: -a amount_of_particle -t: start:step:end\n");
-		return (-1);
-	}
+	// if (ac < 5){
+	// 	printf("\n args format usage: -a amount_of_particle -t: start:step:end\n");
+	// 	return (-1);
+	// }
 
 	argv = av;
 	argc = 1;
