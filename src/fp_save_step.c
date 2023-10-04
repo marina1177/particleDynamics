@@ -17,6 +17,7 @@
 
 	int fp_save_step(t_trap **trap, FILE *fp){
 
+		//printf("fp_save_step\n");
 		double startbit;
 
 		int i = 0;
@@ -25,15 +26,17 @@
 			if(i == 0){
 				//write startbit=1
 				startbit = 1;
-				//printf("SAVE: tcurr = %lf\n", trap->tcurr);
-				fwrite(&startbit,sizeof(double), 1, fp);
+				//printf("SAVE: tcurr = %lf\n", (*trap)->tcurr);
+				fwrite(&startbit, sizeof(double), 1, fp);
 				//fwrite(&(*trap)->tcurr,sizeof(double), 1, fp);
 
 			}else{
 				startbit = 0;
 				fwrite(&startbit,sizeof(double), 1, fp);
 			}
+			//printf("write_particle_state, [%d]\n", i);
 			write_particle_state(fp, i, &(*trap)->particles[i]);
+			//printf("write_particle_parameters, [%d]\n", i);
 			write_particle_parameters(fp, i, &(*trap)->particles[i]);
 			i++;
 		}

@@ -80,7 +80,7 @@ int		main(int ac, char **av)
 	init_trap(fp, &trap);
 
 	//print_parameters(&trap);
-	printf("#####	VERLET	#####\n\n");
+	printf("\n#####	VERLET	#####\n\n");
 	verlet(&trap,fp);
 
 	fclose(fp);

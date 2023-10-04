@@ -82,6 +82,11 @@ int	init_trap(FILE *fp, t_trap	**trap){
 
 	!((*trap)->particles = (t_prtcl *)malloc(sizeof(t_prtcl)*(*trap)->amount_of_particles)) ? handle_error(ERR_ALLOC) : 0;
 
+// массив указателей на структуру particle
+	// !((*trap)->particles = (t_prtcl **)malloc(sizeof(t_prtcl*)*(*trap)->amount_of_particles)) ? handle_error(ERR_ALLOC) : 0;
+	// for(int i = 0 ; i < (*trap)->amount_of_particles; i++)
+	// 	(*trap)->particles[i] = (t_prtcl*)malloc(sizeof(t_prtcl));
+
 	t_prtcl *particles = (*trap)->particles;
 
 	int i = 0;
@@ -95,7 +100,6 @@ int	init_trap(FILE *fp, t_trap	**trap){
 			init_particle_velocity(fp, &(*trap)->particles[i]);
 
 			if(i == 0){
-				//write startbit=1
 				startbit = 1;
 				fwrite(&startbit,sizeof(double), 1, fp);
 			}else{
@@ -140,6 +144,7 @@ int check_flags(FILE *fp, int ac, char **av, t_trap	**trap){
 		if (argv[argc][1] == 'a'){
 			argc++;
 			(*trap)->amount_of_particles = atoi(argv[argc]);
+			(*trap)->length_of_prtcl_arr = (*trap)->amount_of_particles;
 			printf("2. amount of particles: %f\n", (*trap)->amount_of_particles);
 			fwrite(&((*trap)->amount_of_particles), sizeof(double), 1, fp);
 		}
@@ -172,6 +177,13 @@ int check_flags(FILE *fp, int ac, char **av, t_trap	**trap){
 			return(-1);
 		}
 		argc++;
+	}
+
+	if((*trap)->amount_of_particles == 0){
+		(*trap)->amount_of_particles = AMOUNT_OF_PRTCLS;
+			(*trap)->length_of_prtcl_arr = (*trap)->amount_of_particles;
+			printf("2. amount of particles: %f\n", (*trap)->amount_of_particles);
+			fwrite(&((*trap)->amount_of_particles), sizeof(double), 1, fp);
 	}
 	return 0;
 }

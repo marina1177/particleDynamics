@@ -20,6 +20,7 @@
 # define K_CONST			1/(4*3.14*EPS_CONST)
 
 # define AMOUNT_OF_PARAMS  10
+# define AMOUNT_OF_PRTCLS  3
 
 # define T_STEP  10
 # define T_FULL  20
@@ -40,12 +41,12 @@ typedef struct s_vis		t_vis;
 struct		s_params{
 
 // Trap's parameters
-	double		a;		// [m] диаметр электрода
-	double		ra;		// [m] расстояние между центрами электродов
-	double		Ua;		// [V] амплитуда переменного напряжения на электродах
-	double		V;		// [V] амплитуда постянного напряжения на электродах
-	double		freq;	// [Hz] частота переменного напряжения на электродах
-	double		nu;		// вязкость среды (воздуха)
+	double	a;		// [m] диаметр электрода
+	double	ra;		// [m] расстояние между центрами электродов
+	double	Ua;		// [V] амплитуда переменного напряжения на электродах
+	double	V;		// [V] амплитуда постянного напряжения на электродах
+	double	freq;	// [Hz] частота переменного напряжения на электродах
+	double	nu;		// вязкость среды (воздуха)
 
 // Particle's parameters
 	double	rho;	// [kg/m^3] плотность
@@ -59,8 +60,8 @@ struct		s_params{
 };
 
 struct		s_array_of_v4{
-int		max;
-int		len;
+int			max;
+int			len;
 
 //t_v4	*p_arr;
 };
@@ -68,20 +69,19 @@ int		len;
 
 struct		s_vector3{
 
-double	x;
-double	y;
-double	z;
-double	vx;
-double	vy;
-double	vz;
+double		x;
+double		y;
+double		z;
+double		vx;
+double		vy;
+double		vz;
 
-double	r0;		// [m] диаметр, размер частицы
-double	mg;		// [kg] масса частицы
-double	q;		// [e] заряд в единицах элементарного заряда e
+double		r0;		// [m] диаметр, размер частицы
+double		mg;		// [kg] масса частицы
+double		q;		// [e] заряд в единицах элементарного заряда e
 
-double	w;
+double		w;
 };
-
 
 
 struct		s_particle
@@ -91,8 +91,8 @@ struct		s_particle
 	double	r[3];	// [m] координаты
 
 // TODO v & a сразу записывать и не хранить
-	 long double	v[3];	// [m/s]скорость
-	 long double	a[3];	// [m/s^2] ускорение
+	double	v[3];	// [m/s]скорость
+	double	a[3];	// [m/s^2] ускорение
 
 	double	rho;	// [kg/m^3] плотность
 	double	d;		// [m] диаметр, размер частицы
@@ -104,10 +104,10 @@ struct		s_particle
 
 struct		s_forces
 {
-	long double	F_tr[3];	// удерживающая сила ловушки
-	long double	F_st[3];	// сила Стокса
+	double	F_tr[3];	// удерживающая сила ловушки
+	double	F_st[3];	// сила Стокса
 	double	F_mg[3];	// сила гравитации
-	long double	F_q[3];		// сила Кулона
+	double	F_q[3];		// сила Кулона
 };
 
 struct		s_trap
@@ -119,19 +119,19 @@ struct		s_trap
 	double		freq;	// [Hz] частота переменного напряжения на электродах
 	double		nu;		// вязкость среды (воздуха)
 
-	double		amount_of_particles;
-	double		tfull;
-	double		tstep;
-	double		tcurr;
-	//t_params	params;
-	t_prtcl		*particles;
+	double	amount_of_particles;
+	double	tfull;
+	double	tstep;
+	double	tcurr;
+
+	double	length_of_prtcl_arr;
+	t_prtcl	*particles;
 
 	// параметры уравнения Матье
 	double	a_param;
 	double	q_param;
 	double	tau;
 
-	//t_vis		vis;
 };
 
 struct		s_vis
@@ -185,7 +185,13 @@ int			malloc_2d_double_array(double **arr, int x, int y);
 */
 int			free_2d_double_array(double **arr);
 void		ft_free2d(void **array, int len);
+void		free_particles(t_prtcl **prtcls, int size);
 void		free_trap(t_trap **trap);
+
+/*
+** exclude_out_particles.c
+*/
+int			exclude_out_particles(t_trap **trap);
 
 /*
 ** fp_save_step.c
@@ -195,19 +201,28 @@ void		write_particle_parameters(FILE *fp, int i, t_prtcl	*particle);
 int			fp_save_step(t_trap **trap, FILE *fp);
 
 /*
-** verlet.c
+** calc_forces.c
 */
 void		mg_calc(t_trap	*trap,  int p_indx);
 void		Stokes_calc(t_trap	*trap,  int p_indx);
 void		interparticle_Columb_calc(t_trap	*trap,  int p_indx, double t);
 void		acc_trap_calc(t_trap	*trap,  int p_indx, double t);
 void		calc_forces(t_trap	*trap, int p_indx, double t);
+
+
+/*
+** verlet.c
+*/
+int 		check_boarder_conditions(t_trap	**trap, int p_indx);
+void		clean_acc(t_trap	*trap, int p_indx);
+void		calc_crdnts(t_trap	**trap, int partcl_num, double dt);
+void		calc_half_vlcts(t_trap	**trap, int partcl_num, double dt);
 int			verlet(t_trap **trap, FILE *fp);
 
 /*
 ** init.c
 */
-double 		randfrom(double min, double max);
+double		randfrom(double min, double max);
 void		init_particle_velocity(FILE *fp, t_prtcl	*particle);
 void		init_particle_position(FILE *fp, t_prtcl	*particle);
 

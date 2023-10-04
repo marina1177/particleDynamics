@@ -22,8 +22,19 @@ void	ft_free2d(void **array, int len)
 	free(array);
 }
 
-void	free_particles(t_prtcl **prtcls){
-	
+void	free_particles(t_prtcl **prtcls, int size){
+	printf("\nneed free %d particles\n", size);
+	int i;
+	t_prtcl *p;
+
+	i = 0;
+	while(i < size){
+		printf("before free %d force\n", i);
+		free((*prtcls)[i].p_forces);
+		//printf("before free %d prtcl\n", i);
+		free(prtcls[i]);
+		i++;
+	}
 }
 
 void	free_trap(t_trap **trap){
